@@ -1,170 +1,146 @@
+
 # 🌐 AWS ECS Deployment with Terraform – Next.js Application
 
-This repository provides a complete infrastructure-as-code setup using **Terraform** to deploy a containerized **Next.js** application on **Amazon ECS (EC2 launch type)**. It includes integration with **Amazon ECR**, **CloudWatch Logs**, **IAM roles**, and security group configuration for a production-ready deployment pipeline.
+This repository provides a complete **Infrastructure-as-Code (IaC)** setup using **Terraform** to deploy a containerized **Next.js** application on **Amazon ECS (EC2 launch type)**. It's fully modular, production-ready, and integrated with **Amazon ECR**, **CloudWatch Logs**, **IAM roles**, and **Security Groups**.
 
 ---
 
 ## 📌 Key Features
 
-- ✅ Provision ECS Cluster (EC2-based) with Task Definitions
-- 🐳 Build and push Dockerized Next.js app to Amazon ECR
-- 📦 ECS Task Definition to run the container
-- 🔐 Security Group with access to HTTP (80), HTTPS (443), SSH (22), and custom app port (3000)
-- 📊 Integrated CloudWatch Logs for container monitoring
-- 💼 Fully modularized using Terraform
+- ✅ **Provision ECS Cluster (EC2-based)** with Task Definitions
+- 🐳 **Build and Push Dockerized Next.js App** to Amazon ECR
+- 📦 ECS **Task Definition** to run the container
+- 🔐 Security Group: HTTP (80), HTTPS (443), SSH (22), App Port (3000)
+- 📊 **CloudWatch Logs Integration** for Container Monitoring
+- 🧱 **Fully Modularized Infrastructure** using Terraform
 
 ---
 
 ## 🧰 Prerequisites
 
-Ensure you have the following installed and configured:
+Ensure the following tools are installed and configured:
 
-- [Terraform v1.3+](https://developer.hashicorp.com/terraform/downloads)
-- [Docker](https://www.docker.com/)
-- [AWS CLI](https://aws.amazon.com/cli/)
-- AWS credentials configured (`aws configure`)
-- IAM user/role with access to ECS, EC2, ECR, IAM, and CloudWatch
-- Nextjs
+- [Terraform v1.3+](https://www.terraform.io/downloads)
+- [Docker](https://www.docker.com/get-started/)
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
+- AWS credentials via `aws configure`
+- IAM access to ECS, EC2, ECR, IAM, and CloudWatch
+- Node.js v20
 - Python
-- node v20
+- Next.js
 
 ---
 
 ## 🗂️ Repository Structure
 
-```bash
+```
 .
-├── next-app                         #nextjs code
-├── main.tf                          # Main entry to call all modules
-├── variables.tf                     # Global variables
-├── outputs.tf                       # Global outputs
-├── README.md                        # Documentation
+├── next-app/                         # Next.js application code
+├── main.tf                           # Main Terraform configuration
+├── variables.tf                      # Global variables
+├── outputs.tf                        # Global outputs
+├── README.md                         # Documentation
+└── modules/
+    ├── vpc/
+    ├── ecr/
+    └── ecs/
+```
 
-├── modules/
-│   ├── vpc/
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   └── outputs.tf
-│
-│
-│   ├── ecr/
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   └── outputs.tf
-│
-│   ├── ecs/
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   └── outputs.tf
-│
-│
-🚀 Deployment Steps
-1. Clone the Repository
-bash
-Copy
-Edit
+---
+
+## 🚀 Deployment Steps
+
+### 1. Clone the Repository
+
+```bash
 git clone https://github.com/your-username/terraform-aws-ecs-next-app.git
 cd terraform-aws-ecs-next-app
-2. Initialize Terraform
-bash
-Copy
-Edit
+```
+
+### 2. Initialize Terraform
+
+```bash
 terraform init
-3. Apply Terraform Configuration
-bash
-Copy
-Edit
+```
+
+### 3. Apply Terraform Configuration
+
+```bash
 terraform apply
-🐳 Build & Push Docker Image to ECR
-Step 1: Authenticate Docker to ECR
-bash
-Copy
-Edit
+```
+
+---
+
+## 🐳 Build & Push Docker Image to ECR
+
+### Step 1: Authenticate Docker with ECR
+
+```bash
 aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.ap-south-1.amazonaws.com
-Step 2: Build, Tag & Push Docker Image
-bash
-Copy
-Edit
+```
+
+### Step 2: Build, Tag & Push Image
+
+```bash
 docker build -t privaterepoomkar .
 docker tag privaterepoomkar:latest <account-id>.dkr.ecr.ap-south-1.amazonaws.com/privaterepoomkar:latest
 docker push <account-id>.dkr.ecr.ap-south-1.amazonaws.com/privaterepoomkar:latest
-🔍 Verify Deployment
-✅ 1. Check GitHub Actions (if used)
-Go to your GitHub repo → Actions tab
+```
 
-Ensure workflows completed successfully
+---
 
-✅ 2. Check EC2 Instance
-Go to AWS EC2 Console
+## 🔍 Verify Deployment
 
-Confirm a t2.micro instance is running
+### ✅ 1. GitHub Actions (if configured)
+- Navigate to GitHub → **Actions Tab**
+- Ensure workflows run successfully
 
-It should be in us-east-1a
+### ✅ 2. EC2 Instance
+- Open AWS EC2 Console
+- Confirm a `t2.micro` instance is running in `us-east-1a`
+- Should have tag: `Name=ecs-instance`
 
-Instance should have tag: Name: ecs-instance
+### ✅ 3. ECS Cluster
+- Go to ECS Console
+- Confirm `nginx-cluster` is active with `nginx-service` running
 
-✅ 3. Check ECS Cluster
-Go to ECS Console
+### ✅ 4. Application Check
+- Find EC2 Public IP in AWS Console
+- Visit: `http://<public-ip>:3000`
 
-Verify nginx-cluster is active
+---
 
-Confirm nginx-service is running
+## 📈 Auto-Scaling Configuration
 
-Tasks should be in RUNNING state
+| Condition            | Action    | Period | Threshold |
+|----------------------|-----------|--------|-----------|
+| CPU > 80% (2 times)  | Scale Up  | 60s    | 80%       |
+| CPU < 20% (3 times)  | Scale Down| 120s   | 20%       |
 
-✅ 4. Verify Next.js Application
-Go to EC2 console → find public IP
+- Min Size: `1`
+- Max Size: `2`
 
-Visit in browser: http://<public-ip>:3000
+---
 
-You should see your Next.js app
+## 🧾 Terraform Output Example
 
-📈 Auto-Scaling Configuration
-This deployment includes Auto Scaling for the ECS service based on CPU utilization:
-
-Condition	Action	Period	Threshold
-CPU > 80% for 2 periods	Scale up	60s	80%
-CPU < 20% for 3 periods	Scale down	120s	20%
-Min size: 1
-
-Max size: 2
-
-Auto Scaling Policy is tied to ECS Service
-
-🧾 Terraform Output Example
-hcl
-Copy
-Edit
+```hcl
 output "ecs_security_group" {
   value = [aws_security_group.ecs_security_group]
 }
-You may add other useful outputs like:
+```
 
-ECS Cluster Name
+Consider adding more outputs like:
+- ECS Cluster Name
+- Task Definition ARN
+- EC2 Public IP
+- ECR Repository URL
 
-Task Definition ARN
+---
 
-Public IP of EC2
+## 🐳 Dockerfile Example
 
-ECR Repository URL
-
-💰 Cost Awareness
-This deployment uses AWS Free Tier eligible resources by default:
-
-✅ t2.micro EC2 instance (750 hours/month)
-
-✅ ECS cluster (free — you pay only for the EC2)
-
-✅ Elastic Container Registry (ECR) (500 MB/month free)
-
-✅ CloudWatch Basic Monitoring
-
-💡 Important: Always monitor your AWS Billing Dashboard to avoid unexpected charges. Using multiple services outside free tier limits may incur costs.
-
-🔧 Example Dockerfile
-dockerfile
-Copy
-Edit
+```Dockerfile
 FROM node:18-alpine
 
 WORKDIR /app
@@ -174,25 +150,41 @@ RUN npm run build
 
 EXPOSE 3000
 CMD ["npm", "start"]
-Make sure your Next.js app listens on 0.0.0.0:3000 not just localhost.
+```
 
-🧹 Destroy Infrastructure
-bash
-Copy
-Edit
-terraform destroy
-👨‍💻 Maintainer
-Omkar
-💼 GitHub
-🔗 LinkedIn
-
-📄 License
-Licensed under the MIT License.
-
-yaml
-Copy
-Edit
+> **Note**: Ensure your Next.js app listens on `0.0.0.0:3000` instead of `localhost`.
 
 ---
 
-Let me know if you want this version as a downloadable `.md` file or packaged with your repo stru
+## 💰 Cost Awareness
+
+This deployment is designed for **AWS Free Tier**:
+
+- ✅ `t2.micro` EC2 (750 hours/month)
+- ✅ ECS Cluster (free — only pay for EC2)
+- ✅ ECR (500 MB/month free)
+- ✅ CloudWatch Basic Monitoring
+
+💡 *Always monitor your [AWS Billing Dashboard](https://console.aws.amazon.com/billing/home) to avoid surprises.*
+
+---
+
+## 🧹 Destroy Infrastructure
+
+```bash
+terraform destroy
+```
+
+---
+
+## 👨‍💻 Maintainer
+
+**Omkar**  
+📂 [GitHub](https://github.com/omkarclouddev)  
+🔗 [LinkedIn](https://linkedin.com/in/omkarclouddev)  
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
