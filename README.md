@@ -1,192 +1,40 @@
-Of course, Omkar! Here's your **single, comprehensive `README.md` file** — all content merged into one clear and professional document. You can copy this directly into your repository.
+# 🌐 AWS ECS Deployment with Terraform – Next.js Application
+
+This repository provides a complete infrastructure-as-code setup using **Terraform** to deploy a containerized **Next.js** application on **Amazon ECS (EC2 launch type)**. It includes integration with **Amazon ECR**, **CloudWatch Logs**, **IAM roles**, and **security group configuration** for a production-ready deployment pipeline.
 
 ---
 
-### ✅ `README.md`
+## 📌 Key Features
 
-```markdown
-# 🚀 Terraform AWS ECS Setup with Next.js App
-
-This repository contains a complete setup to deploy a **Next.js application** on **Amazon ECS (EC2 launch type)** using **Terraform**. It includes ECR for container images, CloudWatch for logs, security groups for networking, and task definitions to run your app.
-
----
-
-## 📦 Features
-
-- 🚢 Deploys a Dockerized **Next.js** app to ECS
-- 🐳 Manages ECR repository for storing Docker images
-- 🔐 Configures Security Group with ports:
-  - 22 (SSH)
-  - 80 (HTTP)
-  - 443 (HTTPS)
-  - 3000 (App port)
-- 📈 Sets up CloudWatch Logs for ECS container
-- ⚙️ Task definition and execution IAM roles
-- 🧱 Modular, readable Terraform code structure
+- ✅ Provision ECS Cluster (EC2-based) with Task Definitions
+- 🐳 Build and push Dockerized Next.js app to Amazon ECR
+- 📦 ECS Task Definition to run the container
+- 🔐 Security Group with access to HTTP (80), HTTPS (443), SSH (22), and custom app port (3000)
+- 📊 Integrated CloudWatch Logs for container monitoring
+- 💼 Fully automated using Terraform (modular and readable)
 
 ---
 
 ## 🧰 Prerequisites
 
+Ensure you have the following installed and configured:
+
 - [Terraform v1.3+](https://developer.hashicorp.com/terraform/downloads)
-- [Docker](https://docs.docker.com/get-docker/)
-- AWS CLI configured (`aws configure`)
-- IAM user with permissions: ECS, ECR, IAM, EC2, CloudWatch
+- [Docker](https://www.docker.com/)
+- [AWS CLI](https://aws.amazon.com/cli/)
+- AWS credentials configured (`aws configure`)
+- IAM user/role with access to ECS, EC2, ECR, IAM, and CloudWatch
 
 ---
 
-## 🗂️ Project Structure
+## 🗂️ Repository Structure
 
-```
+```bash
 .
-├── main.tf                 # ECS service & EC2 setup
+├── main.tf                 # ECS cluster, EC2 instance & network setup
+├── ecr.tf                  # ECR repository configuration
+├── task-definition.tf      # ECS task and container definitions
+├── security-group.tf       # Security group with inbound rules
 ├── variables.tf            # Input variables
-├── outputs.tf              # Output values
-├── security-group.tf       # Security group rules
-├── ecr.tf                  # Creates ECR repo
-├── task-definition.tf      # ECS Task for Docker container
-├── README.md               # Full guide (this file)
-```
-
----
-
-## 🚀 Getting Started
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/your-username/terraform-aws-ecs-next-app.git
-cd terraform-aws-ecs-next-app
-```
-
-### 2. Initialize Terraform
-
-```bash
-terraform init
-```
-
-### 3. Validate Configuration
-
-```bash
-terraform validate
-```
-
-### 4. Apply Configuration
-
-```bash
-terraform apply
-```
-
----
-
-## 🐳 Build and Push Docker Image to ECR
-
-### 1. Authenticate Docker to ECR
-
-```bash
-aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.ap-south-1.amazonaws.com
-```
-
-### 2. Build Docker Image
-
-```bash
-docker build -t privaterepoomkar .
-```
-
-### 3. Tag Image
-
-```bash
-docker tag privaterepoomkar:latest <your-account-id>.dkr.ecr.ap-south-1.amazonaws.com/privaterepoomkar:latest
-```
-
-### 4. Push to ECR
-
-```bash
-docker push <your-account-id>.dkr.ecr.ap-south-1.amazonaws.com/privaterepoomkar:latest
-```
-
----
-
-## 🧪 Example Dockerfile for Next.js App
-
-```Dockerfile
-# Dockerfile
-FROM node:18-alpine
-
-WORKDIR /app
-COPY . .
-RUN npm install
-RUN npm run build
-
-EXPOSE 3000
-CMD ["npm", "start"]
-```
-
-> ✅ Ensure your Next.js app listens on `0.0.0.0:3000`, not `localhost`, to allow ECS networking.
-
----
-
-## 🔐 Security Group Configuration
-
-| Type     | Protocol | Port | Source      |
-|----------|----------|------|-------------|
-| SSH      | TCP      | 22   | 0.0.0.0/0   |
-| HTTP     | TCP      | 80   | 0.0.0.0/0   |
-| HTTPS    | TCP      | 443  | 0.0.0.0/0   |
-| Custom   | TCP      | 3000 | 0.0.0.0/0   |
-
-Defined in `security-group.tf`.
-
----
-
-## 📤 Terraform Outputs
-
-```hcl
-output "ecs_security_group" {
-  value = [aws_security_group.ecs_security_group]
-}
-```
-
-Other outputs may include ECS Task ARN, public IPs, or ECR repo URLs if added.
-
----
-
-## 🧹 Destroy Resources
-
-```bash
-terraform destroy
-```
-
----
-
-## 🧠 Troubleshooting
-
-- **Next.js not accessible?** Make sure:
-  - Port 3000 is open in the security group
-  - Container listens on `0.0.0.0:3000`
-  - Task is pulling the right image from ECR
-
-- **DNS resolution errors (e.g., `ENOTFOUND`)?**
-  - Ensure container is running in the correct **network mode**
-  - If using bridge mode, access app using public EC2 IP and mapped host port
-
----
-
-## 👨‍💻 Author
-
-**Omkar**  
-🔗 [LinkedIn](https://linkedin.com/in/your-link)  
-💻 [GitHub](https://github.com/your-username)
-
----
-
-## 📝 License
-
-Licensed under the [MIT License](LICENSE).
-
-Feel free to use, modify, and share!
-```
-
----
-
-Let me know if you'd like a GitHub Actions pipeline, CI/CD support, or a version for Fargate-based ECS setup too!
+├── outputs.tf              # Terraform output values
+├── README.md               # Project documentation
