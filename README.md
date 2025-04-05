@@ -1,5 +1,5 @@
 
-# 🌐 AWS ECS Deployment with Terraform – Next.js Application
+# 🌐 AWS ECS Deployment with Terraform – Next.js and python Application
 
 This repository provides a complete **Infrastructure-as-Code (IaC)** setup using **Terraform** to deploy a containerized **Next.js** application on **Amazon ECS (EC2 launch type)**. It's fully modular, production-ready, and integrated with **Amazon ECR**, **CloudWatch Logs**, **IAM roles**, and **Security Groups**.
 
@@ -8,9 +8,9 @@ This repository provides a complete **Infrastructure-as-Code (IaC)** setup using
 ## 📌 Key Features
 
 - ✅ **Provision ECS Cluster (EC2-based)** with Task Definitions
-- 🐳 **Build and Push Dockerized Next.js App** to Amazon ECR
-- 📦 ECS **Task Definition** to run the container
-- 🔐 Security Group: HTTP (80), HTTPS (443), SSH (22), App Port (3000)
+- 🐳 **Build and Push Dockerized Next.js and python App** to Amazon ECR
+- 📦 ECS **Task Definition** to run the container of Next.js and python
+- 🔐 Security Group: 
 - 📊 **CloudWatch Logs Integration** for Container Monitoring
 - 🧱 **Fully Modularized Infrastructure** using Terraform
 
@@ -91,21 +91,19 @@ docker push <account-id>.dkr.ecr.ap-south-1.amazonaws.com/privaterepoomkar:lates
 
 ## 🔍 Verify Deployment
 
-### ✅ 1. GitHub Actions (if configured)
-- Navigate to GitHub → **Actions Tab**
-- Ensure workflows run successfully
 
-### ✅ 2. EC2 Instance
+### ✅ 1. EC2 Instance
 - Open AWS EC2 Console
 - Confirm a `t2.micro` instance is running in `us-east-1a`
 - Should have tag: `Name=ecs-instance`
 
-### ✅ 3. ECS Cluster
+### ✅ 2. ECS Cluster
 - Go to ECS Console
 - Confirm `nginx-cluster` is active with `nginx-service` running
 
-### ✅ 4. Application Check
-- Find EC2 Public IP in AWS Console
+### ✅ 3. Application Check
+1-open load balncer and go to DNS 
+2- Find EC2 Public I in AWS Console
 - Visit: `http://<public-ip>:3000`
 
 ---
@@ -119,22 +117,6 @@ docker push <account-id>.dkr.ecr.ap-south-1.amazonaws.com/privaterepoomkar:lates
 
 - Min Size: `1`
 - Max Size: `2`
-
----
-
-## 🧾 Terraform Output Example
-
-```hcl
-output "ecs_security_group" {
-  value = [aws_security_group.ecs_security_group]
-}
-```
-
-Consider adding more outputs like:
-- ECS Cluster Name
-- Task Definition ARN
-- EC2 Public IP
-- ECR Repository URL
 
 ---
 
@@ -180,11 +162,6 @@ terraform destroy
 ## 👨‍💻 Maintainer
 
 **Omkar**  
-📂 [GitHub](https://github.com/omkarclouddev)  
-🔗 [LinkedIn](https://linkedin.com/in/omkarclouddev)  
-
+📂 [GitHub]
 ---
 
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
