@@ -102,8 +102,9 @@ docker push <account-id>.dkr.ecr.ap-south-1.amazonaws.com/privaterepoomkar:lates
 - Confirm `nginx-cluster` is active with `nginx-service` running
 
 ### ✅ 3. Application Check
-1-open load balncer and go to DNS 
-2- Find EC2 Public I in AWS Console
+✅1-open load balncer and go to DNS 
+
+✅2- Find EC2 Public I in AWS Console
 - Visit: `http://<public-ip>:3000`
 
 ---
