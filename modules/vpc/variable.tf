@@ -3,7 +3,7 @@ variable "cidr_block"{
 }
 
 variable "vpc_name" {
-  default = "Task2"
+  default = "Task3"
 }
 
 
@@ -15,10 +15,10 @@ variable "subnet2_cidr_block" {
   default = "12.0.3.0/24"
 }
 
-variable "new_security_group_id" {
-   default = "sg-00a1482f9e9149b99"
-   description = "Security group ID for the ECS service"
-}
+# variable "new_security_group_id" {
+#    default = "sg-00a1482f9e9149b99"
+#    description = "Security group ID for the ECS service"
+# }
 
 variable "zone1" {
   default = "ap-south-1a"
